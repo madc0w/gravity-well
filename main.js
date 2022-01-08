@@ -25,7 +25,7 @@ function onLoad() {
 			},
 			vel: {
 				x: 0,
-				y: 2 + Math.random() * 12,
+				y: 2 + (Math.random() - 0.5) * 18,
 			},
 			mass: 0.2 + Math.random() * 2,
 			style: '#' + color,
@@ -73,10 +73,29 @@ function draw() {
 	ctx.fill();
 
 	for (const planet of planets) {
+		const theta = Math.atan2(planet.pos.y - center.y, planet.pos.x - center.x);
+		// console.log(theta / Math.PI);
 		const r = (planet.mass * canvas.width) / massScale;
 		ctx.fillStyle = planet.style;
 		ctx.beginPath();
-		ctx.arc(planet.pos.x, planet.pos.y, r, 0, 2 * Math.PI);
+		ctx.arc(
+			planet.pos.x,
+			planet.pos.y,
+			r,
+			theta + Math.PI / 2,
+			theta - Math.PI / 2
+		);
+		ctx.fill();
+
+		ctx.fillStyle = '#000';
+		ctx.beginPath();
+		ctx.arc(
+			planet.pos.x,
+			planet.pos.y,
+			r,
+			theta - Math.PI / 2,
+			theta + Math.PI / 2
+		);
 		ctx.fill();
 	}
 
