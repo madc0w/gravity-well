@@ -13,42 +13,24 @@ function onLoad() {
 	};
 	ctx = canvas.getContext('2d');
 
-	planets.push({
-		pos: {
-			x: canvas.width / 2 + 120,
-			y: canvas.height / 2,
-		},
-		vel: {
-			x: 0,
-			y: 6,
-		},
-		mass: 1,
-		style: '#28c',
-	});
-	planets.push({
-		pos: {
-			x: canvas.width / 2 + 240,
-			y: canvas.height / 2,
-		},
-		vel: {
-			x: 0,
-			y: 8,
-		},
-		mass: 2,
-		style: '#66c',
-	});
-	planets.push({
-		pos: {
-			x: canvas.width / 2 + 360,
-			y: canvas.height / 2,
-		},
-		vel: {
-			x: 0,
-			y: 4,
-		},
-		mass: 0.4,
-		style: '#f6c',
-	});
+	for (let i = 0; i < 20; i++) {
+		let color = Math.floor(Math.random() * (1 << 12)).toString(16);
+		while (color.length < 3) {
+			color = '0' + color;
+		}
+		planets.push({
+			pos: {
+				x: canvas.width / 2 + 40 + Math.random() * 400,
+				y: canvas.height / 2,
+			},
+			vel: {
+				x: 0,
+				y: 2 + Math.random() * 12,
+			},
+			mass: 0.2 + Math.random() * 2,
+			style: '#' + color,
+		});
+	}
 
 	requestAnimationFrame(draw);
 
