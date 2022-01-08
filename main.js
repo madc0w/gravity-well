@@ -32,10 +32,22 @@ function onLoad() {
 		},
 		vel: {
 			x: 0,
-			y: 6,
+			y: 8,
 		},
 		mass: 2,
 		style: '#66c',
+	});
+	planets.push({
+		pos: {
+			x: canvas.width / 2 + 360,
+			y: canvas.height / 2,
+		},
+		vel: {
+			x: 0,
+			y: 4,
+		},
+		mass: 0.4,
+		style: '#f6c',
 	});
 
 	requestAnimationFrame(draw);
