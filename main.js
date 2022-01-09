@@ -1,44 +1,80 @@
-const massScale = 80;
-const velScale = 0.2;
-let canvas, ctx, center;
+const numPlanets = 8;
+const velScale = 0.004;
+const explosionSize = 60;
+
+let canvas,
+	ctx,
+	center,
+	sunRadius,
+	collisions = [];
+const explosionImg = new Image();
 const planets = [];
 
 function onLoad() {
+	explosionImg.src = 'img/explosion.webp';
+
 	canvas = document.getElementById('game-canvas');
 	canvas.width = 800;
 	canvas.height = 800;
+	sunRadius = canvas.width / 12;
 	center = {
 		x: canvas.width / 2,
 		y: canvas.height / 2,
 	};
+
 	ctx = canvas.getContext('2d');
 
-	for (let i = 0; i < 20; i++) {
+	for (let i = 0; i < numPlanets; i++) {
 		let color = Math.floor(Math.random() * (1 << 12)).toString(16);
 		while (color.length < 3) {
 			color = '0' + color;
 		}
-		planets.push({
-			pos: {
-				x: canvas.width / 2 + 40 + Math.random() * 400,
-				y: canvas.height / 2,
-			},
+		const planet = {
+			id: i,
 			vel: {
 				x: 0,
-				y: 2 + (Math.random() - 0.5) * 18,
+				y: (Math.random() < 0.5 ? 1 : -1) * (1 + Math.random() * 0.4),
 			},
-			mass: 0.2 + Math.random() * 2,
+			radius: 2 + Math.random() * 20,
 			style: '#' + color,
-		});
+		};
+		let isCollision;
+		do {
+			planet.pos = {
+				x: center.x + 40 + Math.random() * 400,
+				y: center.y + (Math.random() - 0.5) * 100,
+			};
+			isCollision = false;
+			for (const planet2 of planets) {
+				if (dist(planet.pos, planet2.pos) <= planet.radius + planet2.radius) {
+					isCollision = true;
+					// console.log('init collission', planet.id, planet2.id);
+					break;
+				}
+			}
+		} while (isCollision);
+		planets.push(planet);
 	}
 
 	requestAnimationFrame(draw);
 
-	setInterval(step, 20);
+	setInterval(step, 1);
 }
 
 function step() {
+	collisions = [];
 	for (const planet of planets) {
+		for (const planet2 of planets) {
+			if (planet != planet2) {
+				if (dist(planet.pos, planet2.pos) <= planet.radius + planet2.radius) {
+					console.log('collision', planet.id, planet2.id);
+					collisions.push({
+						planet1: planet,
+						planet2,
+					});
+				}
+			}
+		}
 		planet.pos.x += planet.vel.x;
 		planet.pos.y += planet.vel.y;
 
@@ -50,11 +86,7 @@ function step() {
 
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
 	const canvasStyle = getComputedStyle(canvas);
-
-	const sunRadius = canvas.width / 12;
-
 	const gradient = ctx.createRadialGradient(
 		center.x,
 		center.y,
@@ -72,16 +104,16 @@ function draw() {
 	ctx.arc(center.x, center.y, sunRadius, 0, 2 * Math.PI);
 	ctx.fill();
 
+	ctx.font = '20px Arial';
 	for (const planet of planets) {
 		const theta = Math.atan2(planet.pos.y - center.y, planet.pos.x - center.x);
 		// console.log(theta / Math.PI);
-		const r = (planet.mass * canvas.width) / massScale;
 		ctx.fillStyle = planet.style;
 		ctx.beginPath();
 		ctx.arc(
 			planet.pos.x,
 			planet.pos.y,
-			r,
+			planet.radius,
 			theta + Math.PI / 2,
 			theta - Math.PI / 2
 		);
@@ -92,11 +124,24 @@ function draw() {
 		ctx.arc(
 			planet.pos.x,
 			planet.pos.y,
-			r,
+			planet.radius,
 			theta - Math.PI / 2,
 			theta + Math.PI / 2
 		);
 		ctx.fill();
+
+		ctx.fillStyle = '#fff';
+		ctx.fillText(planet.id, planet.pos.x, planet.pos.y);
+	}
+
+	for (const collision of collisions) {
+		ctx.drawImage(
+			explosionImg,
+			(collision.planet1.pos.x + collision.planet2.pos.x - explosionSize) / 2,
+			(collision.planet1.pos.y + collision.planet2.pos.y - explosionSize) / 2,
+			explosionSize,
+			explosionSize
+		);
 	}
 
 	requestAnimationFrame(draw);
