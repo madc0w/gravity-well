@@ -166,6 +166,22 @@ function draw() {
 		// console.log(theta / Math.PI);
 		ctx.fillStyle = planet.style;
 		ctx.beginPath();
+		ctx.arc(planet.pos.x, planet.pos.y, planet.radius, 0, Math.PI * 2);
+		ctx.fill();
+
+		const gradient = ctx.createRadialGradient(
+			planet.pos.x,
+			planet.pos.y,
+			0,
+			planet.pos.x,
+			planet.pos.y,
+			planet.radius
+		);
+		gradient.addColorStop(0, '#000f');
+		gradient.addColorStop(1, '#0000');
+		ctx.fillStyle = gradient;
+		// ctx.fillStyle = '#000c';
+		ctx.beginPath();
 		ctx.arc(
 			planet.pos.x,
 			planet.pos.y,
