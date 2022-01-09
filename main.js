@@ -1,6 +1,7 @@
 const numPlanets = 8;
 const velScale = 0.004;
 const explosionSize = 60;
+const sunRotVel = 0.002;
 
 let canvas,
 	ctx,
@@ -42,6 +43,8 @@ function onLoad() {
 				y: (Math.random() < 0.5 ? 1 : -1) * (1 + Math.random() * 0.4),
 			},
 			radius: 8 + Math.random() * 24,
+			rotVel: (Math.random() - 0.5) * 0.01,
+			rot: 0,
 			style: '#' + color,
 		};
 		let isCollision;
@@ -87,7 +90,9 @@ function step() {
 		const _dist = dist(planet.pos, center);
 		planet.vel.x += (velScale * (center.x - planet.pos.x)) / _dist;
 		planet.vel.y += (velScale * (center.y - planet.pos.y)) / _dist;
+		planet.rot += planet.rotVel;
 	}
+	sunRot += sunRotVel;
 }
 
 function draw() {
@@ -111,17 +116,23 @@ function draw() {
 	ctx.fill();
 
 	drawImage(sunImg, center.x, center.y, 0.12, sunRot);
-	sunRot += 0.008;
 
 	ctx.font = '20px Arial';
 	for (const planet of planets) {
-		ctx.drawImage(
+		drawImage(
 			venusImg,
-			planet.pos.x - planet.radius,
-			planet.pos.y - planet.radius,
-			planet.radius * 2,
-			planet.radius * 2
+			planet.pos.x,
+			planet.pos.y,
+			(2 * planet.radius) / venusImg.width,
+			planet.rot
 		);
+		// ctx.drawImage(
+		// 	venusImg,
+		// 	planet.pos.x - planet.radius,
+		// 	planet.pos.y - planet.radius,
+		// 	planet.radius * 2,
+		// 	planet.radius * 2
+		// );
 
 		const theta = Math.atan2(planet.pos.y - center.y, planet.pos.x - center.x);
 		// console.log(theta / Math.PI);
