@@ -6,7 +6,8 @@ let canvas,
 	ctx,
 	center,
 	sunRadius,
-	collisions = [];
+	collisions = [],
+	sunRot = 0;
 const explosionImg = new Image();
 const sunImg = new Image();
 const venusImg = new Image();
@@ -109,13 +110,8 @@ function draw() {
 	ctx.arc(center.x, center.y, sunRadius, 0, 2 * Math.PI);
 	ctx.fill();
 
-	ctx.drawImage(
-		sunImg,
-		center.x - sunRadius * 0.6,
-		center.y - sunRadius * 0.6,
-		sunRadius * 1.2,
-		sunRadius * 1.2
-	);
+	drawImage(sunImg, center.x, center.y, 0.12, sunRot);
+	sunRot += 0.008;
 
 	ctx.font = '20px Arial';
 	for (const planet of planets) {
@@ -172,4 +168,14 @@ function dist(a, b) {
 	const dx = a.x - b.x;
 	const dy = a.y - b.y;
 	return Math.sqrt(dx * dx + dy * dy);
+}
+
+function drawImage(image, x, y, scale, rotation) {
+	ctx.save();
+	ctx.setTransform(scale, 0, 0, scale, x, y);
+	ctx.rotate(rotation);
+	const cx = image.width / 2;
+	const cy = image.height / 2;
+	ctx.drawImage(image, -cx, -cy);
+	ctx.restore();
 }
