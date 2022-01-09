@@ -140,7 +140,7 @@ function draw() {
 		);
 		ctx.fill();
 
-		ctx.fillStyle = '#000';
+		ctx.fillStyle = '#000c';
 		ctx.beginPath();
 		ctx.arc(
 			planet.pos.x,
