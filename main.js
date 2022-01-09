@@ -51,7 +51,7 @@ function onLoad() {
 				y: (Math.random() < 0.5 ? 1 : -1) * (1 + Math.random() * 0.4),
 			},
 			radius: 8 + Math.random() * 24,
-			rotVel: (Math.random() - 0.5) * 0.01,
+			rotVel: (Math.random() - 0.5) * 0.02,
 			rot: 0,
 			style: '#' + color,
 		};
