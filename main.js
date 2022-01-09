@@ -8,10 +8,14 @@ let canvas,
 	sunRadius,
 	collisions = [];
 const explosionImg = new Image();
+const sunImg = new Image();
+const venusImg = new Image();
 const planets = [];
 
 function onLoad() {
-	explosionImg.src = 'img/explosion.webp';
+	explosionImg.src = 'img/explosion.png';
+	sunImg.src = 'img/sun.png';
+	venusImg.src = 'img/venus.png';
 
 	canvas = document.getElementById('game-canvas');
 	canvas.width = 800;
@@ -29,13 +33,14 @@ function onLoad() {
 		while (color.length < 3) {
 			color = '0' + color;
 		}
+		color += '4';
 		const planet = {
 			id: i,
 			vel: {
 				x: 0,
 				y: (Math.random() < 0.5 ? 1 : -1) * (1 + Math.random() * 0.4),
 			},
-			radius: 2 + Math.random() * 20,
+			radius: 8 + Math.random() * 24,
 			style: '#' + color,
 		};
 		let isCollision;
@@ -104,8 +109,24 @@ function draw() {
 	ctx.arc(center.x, center.y, sunRadius, 0, 2 * Math.PI);
 	ctx.fill();
 
+	ctx.drawImage(
+		sunImg,
+		center.x - sunRadius * 0.6,
+		center.y - sunRadius * 0.6,
+		sunRadius * 1.2,
+		sunRadius * 1.2
+	);
+
 	ctx.font = '20px Arial';
 	for (const planet of planets) {
+		ctx.drawImage(
+			venusImg,
+			planet.pos.x - planet.radius,
+			planet.pos.y - planet.radius,
+			planet.radius * 2,
+			planet.radius * 2
+		);
+
 		const theta = Math.atan2(planet.pos.y - center.y, planet.pos.x - center.x);
 		// console.log(theta / Math.PI);
 		ctx.fillStyle = planet.style;
@@ -130,8 +151,8 @@ function draw() {
 		);
 		ctx.fill();
 
-		ctx.fillStyle = '#fff';
-		ctx.fillText(planet.id, planet.pos.x, planet.pos.y);
+		// ctx.fillStyle = '#fff';
+		// ctx.fillText(planet.id, planet.pos.x, planet.pos.y);
 	}
 
 	for (const collision of collisions) {
