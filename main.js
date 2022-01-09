@@ -22,7 +22,7 @@ function onLoad() {
 	canvas = document.getElementById('game-canvas');
 	canvas.width = 800;
 	canvas.height = 800;
-	sunRadius = canvas.width / 12;
+	sunRadius = canvas.width / 8;
 	center = {
 		x: canvas.width / 2,
 		y: canvas.height / 2,
@@ -96,24 +96,33 @@ function step() {
 }
 
 function draw() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	const canvasStyle = getComputedStyle(canvas);
-	const gradient = ctx.createRadialGradient(
-		center.x,
-		center.y,
-		sunRadius * 0.2,
-		center.x,
-		center.y,
-		sunRadius
-	);
-	gradient.addColorStop(0, '#fdb61c');
-	// TODO how to make alpha work??
-	gradient.addColorStop(1, canvasStyle.backgroundColor);
+	{
+		const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+		gradient.addColorStop(0, '#00a');
+		gradient.addColorStop(1, '#000');
+		// ctx.fillStyle = '#226';
+		ctx.fillStyle = gradient;
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+	}
 
-	ctx.fillStyle = gradient;
-	ctx.beginPath();
-	ctx.arc(center.x, center.y, sunRadius, 0, 2 * Math.PI);
-	ctx.fill();
+	// const canvasStyle = getComputedStyle(canvas);
+	{
+		const gradient = ctx.createRadialGradient(
+			center.x,
+			center.y,
+			sunRadius * 0.2,
+			center.x,
+			center.y,
+			sunRadius
+		);
+		gradient.addColorStop(0, '#fca816cc');
+		gradient.addColorStop(1, '#0000');
+
+		ctx.fillStyle = gradient;
+		ctx.beginPath();
+		ctx.arc(center.x, center.y, sunRadius, 0, 2 * Math.PI);
+		ctx.fill();
+	}
 
 	drawImage(sunImg, center.x, center.y, 0.12, sunRot);
 
