@@ -2,22 +2,29 @@ const numPlanets = 8;
 const velScale = 0.004;
 const explosionSize = 60;
 const sunRotVel = 0.002;
+const planetGravitationScale = 0.00001;
 
 let canvas,
 	ctx,
 	center,
 	sunRadius,
 	collisions = [],
+	planetImages = [],
 	sunRot = 0;
 const explosionImg = new Image();
 const sunImg = new Image();
-const venusImg = new Image();
+const starryNightImg = new Image();
 const planets = [];
 
 function onLoad() {
 	explosionImg.src = 'img/explosion.png';
 	sunImg.src = 'img/sun.png';
-	venusImg.src = 'img/venus.png';
+	starryNightImg.src = 'img/starry night.jpg';
+	for (const filename of ['venus.png', 'jupiter.png', 'earth.png']) {
+		const img = new Image();
+		img.src = `img/${filename}`;
+		planetImages.push(img);
+	}
 
 	canvas = document.getElementById('game-canvas');
 	canvas.width = 800;
@@ -38,6 +45,7 @@ function onLoad() {
 		color += '4';
 		const planet = {
 			id: i,
+			img: planetImages[Math.floor(Math.random() * planetImages.length)],
 			vel: {
 				x: 0,
 				y: (Math.random() < 0.5 ? 1 : -1) * (1 + Math.random() * 0.4),
@@ -67,7 +75,16 @@ function onLoad() {
 
 	requestAnimationFrame(draw);
 
-	setInterval(step, 1);
+	let isComputingStep;
+	setInterval(() => {
+		if (isComputingStep) {
+			console.log('isComputingStep');
+		} else {
+			isComputingStep = true;
+			step();
+			isComputingStep = false;
+		}
+	}, 1);
 }
 
 function step() {
@@ -76,30 +93,39 @@ function step() {
 		for (const planet2 of planets) {
 			if (planet != planet2) {
 				if (dist(planet.pos, planet2.pos) <= planet.radius + planet2.radius) {
-					console.log('collision', planet.id, planet2.id);
+					// console.log('collision', planet.id, planet2.id);
 					collisions.push({
 						planet1: planet,
 						planet2,
 					});
 				}
+
+				const factor =
+					(velScale * planetGravitationScale * planet2.radius * planet.radius) /
+					dist(planet.pos, planet2.pos);
+				planet.vel.x += factor * (planet2.pos.x - planet.pos.x);
+				planet.vel.y += factor * (planet2.pos.y - planet.pos.y);
 			}
 		}
 		planet.pos.x += planet.vel.x;
 		planet.pos.y += planet.vel.y;
 
-		const _dist = dist(planet.pos, center);
-		planet.vel.x += (velScale * (center.x - planet.pos.x)) / _dist;
-		planet.vel.y += (velScale * (center.y - planet.pos.y)) / _dist;
-		planet.rot += planet.rotVel;
+		{
+			const _dist = dist(planet.pos, center);
+			planet.vel.x += (velScale * (center.x - planet.pos.x)) / _dist;
+			planet.vel.y += (velScale * (center.y - planet.pos.y)) / _dist;
+			planet.rot += planet.rotVel;
+		}
 	}
 	sunRot += sunRotVel;
 }
 
 function draw() {
+	ctx.drawImage(starryNightImg, 0, 0, canvas.width, canvas.height);
 	{
 		const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-		gradient.addColorStop(0, '#00a');
-		gradient.addColorStop(1, '#000');
+		gradient.addColorStop(0, '#00a0');
+		gradient.addColorStop(1, '#000f');
 		// ctx.fillStyle = '#226';
 		ctx.fillStyle = gradient;
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -129,19 +155,12 @@ function draw() {
 	ctx.font = '20px Arial';
 	for (const planet of planets) {
 		drawImage(
-			venusImg,
+			planet.img,
 			planet.pos.x,
 			planet.pos.y,
-			(2 * planet.radius) / venusImg.width,
+			(2 * planet.radius) / planet.img.width,
 			planet.rot
 		);
-		// ctx.drawImage(
-		// 	venusImg,
-		// 	planet.pos.x - planet.radius,
-		// 	planet.pos.y - planet.radius,
-		// 	planet.radius * 2,
-		// 	planet.radius * 2
-		// );
 
 		const theta = Math.atan2(planet.pos.y - center.y, planet.pos.x - center.x);
 		// console.log(theta / Math.PI);
